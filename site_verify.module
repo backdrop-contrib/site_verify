@@ -127,7 +127,7 @@ function site_verify_load($svid) {
  * @param $engine
  *   A string with the engine shortname.
  * @return
- *   An arary of the engine details, or FALSE if not found.
+ *   An array of the engine details, or FALSE if not found.
  */
 function site_verify_engine_load($engine) {
   $engines = site_verify_get_engines();

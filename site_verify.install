@@ -92,7 +92,7 @@ function site_verify_update_3() {
  * Import data from XML sitemap engines.
  */
 function site_verify_import_xmlsitemap() {
-  $engines = array('google', 'bing', 'yahoo');
+  $engines = array('google', 'bing');
   foreach ($engines as $engine) {
     if ($file = variable_get('xmlsitemap_engines_' . $engine . '_verify', '')) {
       db_merge('site_verify')

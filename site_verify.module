@@ -143,12 +143,6 @@ function site_verify_site_verify_engine_info() {
     'meta' => TRUE,
     'meta_example' => '<meta name="google-site-verification" content="NbwaW3WIDp_SPsSsfl78Ive7F34-znm9lxLJXjuWNGE" />',
   );
-  $engines['yahoo'] = array(
-    'name' => t('Yahoo!'),
-    'file' => TRUE,
-    'file_contents' => TRUE,
-    'meta' => TRUE,
-  );
   $engines['bing'] = array(
     'name' => t('Bing'),
     'file' => TRUE,

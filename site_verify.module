@@ -111,9 +111,12 @@ function site_verify_init() {
  *   An array of the site verification record, or FALSE if not found.
  */
 function site_verify_load($svid) {
-  $record = db_query("SELECT svid, engine, file, file_contents, meta FROM {site_verify} WHERE svid = :svid", array(':svid' => $svid))->fetchAssoc();
-  if ($record) {
-    $record['engine'] = site_verify_engine_load($record['engine']);
+  $record = &drupal_static(__FUNCTION__ . $svid);
+  if (!$record) {
+    $record = db_query("SELECT svid, engine, file, file_contents, meta FROM {site_verify} WHERE svid = :svid", array(':svid' => $svid))->fetchAssoc();
+    if ($record) {
+      $record['engine'] = site_verify_engine_load($record['engine']);
+    }
   }
   return $record;
 }

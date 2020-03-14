@@ -6,18 +6,13 @@
 
 class SiteVerifyFunctionalTestCase extends BackdropWebTestCase {
 
-  public static function getInfo() {
-    return array(
-      'name' => 'Site verification functional tests',
-      'description' => 'Test site verification functionality.',
-      'group' => 'Site verification',
-    );
-  }
-
   function setUp() {
     parent::setUp(array('site_verify'));
 
-    $user = $this->backdropCreateUser(array('administer site configuration'));
+    $user = $this->backdropCreateUser(array(
+      'administer site configuration',
+      'administer site verify',
+    ));
     $this->backdropLogin($user);
   }
 
@@ -29,15 +24,19 @@ class SiteVerifyFunctionalTestCase extends BackdropWebTestCase {
     // Add a dummy Google meta tag.
     $edit = array('engine' => 'google');
     $this->backdropPost('admin/config/search/verifications/add', $edit, t('Next'));
-    $meta_tag = '<meta name="google-site-verification" content="' . $this->randomName() . '">';
+    $verification_code = $this->randomName();
+    $meta_tag = '<meta name="google-site-verification" content="' . $verification_code . '">';
     $edit = array('meta' => $meta_tag);
     $this->backdropPost(NULL, $edit, t('Save'));
     $this->assertText('Verification saved.');
     $this->assertText('Google');
 
-    // Check if it displays on the front page.
-    $this->backdropGet('');
-    $this->assertRaw($meta_tag, 'Verification code displayed on front page.');
+    // Check if the metatag displays on the front page.
+    $this->backdropGet('<front>');
+    // Check for the specific metatag using xpath.
+    $xpath = $this->xpath("//meta[@name='google-site-verification']");
+    $this->assertEqual(count($xpath), 1, 'Exactly one google verification meta tag found.');
+    $this->assertEqual($xpath[0]['content'], $verification_code, 'Google verification code as specified');
 
     // Now try to delete it.
     $this->backdropGet('admin/config/search/verifications');

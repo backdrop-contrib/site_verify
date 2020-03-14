@@ -1,0 +1,5 @@
+[SiteVerifyFunctionalTestCase]
+name = Site verification functional tests
+description = Test site verification functionality.
+group = Site verification
+file = site_verify.test

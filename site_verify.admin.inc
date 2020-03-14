@@ -1,8 +1,15 @@
 <?php
+/**
+ * @file
+ * Administration pages for site verification.
+ */
 
+/**
+ * Page callback.
+ */
 function site_verify_list() {
   $engines = site_verify_get_engines();
-  $destination = drupal_get_destination();
+  $destination = backdrop_get_destination();
 
   $header = array(
     array('data' => t('Engine'), 'field' => 'engine'),
@@ -154,7 +161,7 @@ function site_verify_edit_form($form, &$form_state, $record = array(), $engine =
 
       // Add a warning message if Clean URLs is not available.
       if (!variable_get('clean_url', 0)) {
-        drupal_set_message(t('Using verification files will not work if <a href="@clean-urls">clean URLs</a> are disabled.', array('@clean-urls' => url('admin/settings/clean-url'))), 'error', FALSE);
+        backdrop_set_message(t('Using verification files will not work if <a href="@clean-urls">clean URLs</a> are disabled.', array('@clean-urls' => url('admin/settings/clean-url'))), 'error', FALSE);
         $form['file']['#disabled'] = TRUE;
         $form['file_contents']['#disabled'] = TRUE;
         $form['file_upload']['#disabled'] = TRUE;
@@ -217,12 +224,12 @@ function site_verify_edit_form_validate($form, &$form_state) {
         $contents = @file_get_contents($file->uri);
         file_delete($file);
         if ($contents === FALSE) {
-          drupal_set_message(t('The verification file import failed, because the file %filename could not be read.', array('%filename' => $file->filename)), 'error');
+          backdrop_set_message(t('The verification file import failed, because the file %filename could not be read.', array('%filename' => $file->filename)), 'error');
         }
         else {
           $values['file'] = $file->filename;
           $values['file_contents'] = $contents;
-          //drupal_set_message(t('The verification file <a href="@filename">@filename</a> was successfully imported.', array('@filename' => $file->filename)));
+          //backdrop_set_message(t('The verification file <a href="@filename">@filename</a> was successfully imported.', array('@filename' => $file->filename)));
         }
       }
 
@@ -243,7 +250,7 @@ function site_verify_edit_form_validate($form, &$form_state) {
 }
 
 /**
- * Submission callback; send form to the next step or save the verification.
+ * Submit callback; send form to the next step or save the verification.
  */
 function site_verify_edit_form_submit($form, &$form_state) {
   if ($form_state['storage']['step'] == 1) {
@@ -255,13 +262,13 @@ function site_verify_edit_form_submit($form, &$form_state) {
   else {
     // Save the verification to the database.
     if ($form_state['values']['svid']) {
-      drupal_write_record('site_verify', $form_state['values'], array('svid'));
+      backdrop_write_record('site_verify', $form_state['values'], array('svid'));
     }
     else {
-      drupal_write_record('site_verify', $form_state['values']);
+      backdrop_write_record('site_verify', $form_state['values']);
     }
 
-    drupal_set_message(t('Verification saved.'));
+    backdrop_set_message(t('Verification saved.'));
     $form_state['storage'] = $form_state['rebuild'] = NULL;
     $form_state['redirect'] = 'admin/config/search/verifications';
 
@@ -291,10 +298,13 @@ function site_verify_delete_form($form, $form_state, $record) {
   );
 }
 
+/**
+ * Submit callback; delete the verification.
+ */
 function site_verify_delete_form_submit($form, &$form_state) {
   $record = $form_state['values']['record'];
   db_delete('site_verify')->condition('svid', $record['svid'])->execute();
-  drupal_set_message(t('Verification for %engine has been deleted.', array('%engine' => $record['engine']['name'])));
+  backdrop_set_message(t('Verification for %engine has been deleted.', array('%engine' => $record['engine']['name'])));
   watchdog('site_verify', 'Verification for %engine deleted.', array('%engine' => $record['engine']['name']), WATCHDOG_NOTICE);
   $form_state['redirect'] = 'admin/config/search/verifications';
 
@@ -303,7 +313,6 @@ function site_verify_delete_form_submit($form, &$form_state) {
   cache_clear_all(url(variable_get('site_frontpage', 'node'), array('absolute' => TRUE)), 'cache_page');
   variable_set('menu_rebuild_needed', TRUE);
 }
-
 
 /**
  * Validate that the 'meta' property uses the correct pattern for Google.
@@ -315,6 +324,9 @@ function site_verify_validate_meta_google($element, &$form_state) {
   }
 }
 
+/**
+ * Validate that the verification page uses the correct pattern for Google.
+ */
 function site_verify_validate_page_google($element, &$form_state) {
   $value = strtolower(trim($element['#value']));
   if ($value != '' && !preg_match('%\Agoogle[\da-f]+\.html\Z%', $value)) {

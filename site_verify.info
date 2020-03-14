@@ -1,8 +1,13 @@
+type = module
 name = Site Verification
-description = "Verifies ownership of a site for use with search engines."
-core = 7.x
+description = Verifies ownership of a site for use with search engines.
+backdrop = 1.x
+
+configure = admin/config/search/verifications
+
+; @todo - convert tests to Backdrop
 files[] = site_verify.module
 files[] = site_verify.admin.inc
 files[] = site_verify.install
 files[] = site_verify.test
-configure = admin/config/search/verifications
+
